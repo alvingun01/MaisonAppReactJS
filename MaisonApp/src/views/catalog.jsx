@@ -2,6 +2,7 @@ import "../main.css"
 import Productcard from '../component/productcard';
 import { useState, useEffect } from 'react';
 import { HttpService } from '../services/httpService';
+import { CartService } from '../services/cartService';
 
 export default function Catalog() {
     const [products, setProducts] = useState([]);
@@ -25,16 +26,28 @@ export default function Catalog() {
 
     const addToCart = async (product) => {
         try {
-            await HttpService.createCartItem({ product: product.id, quantity: 1 });
-            alert(`${product.name} added to cart!`);
+            await CartService.addToCart(product, 1);
+            if (window.showToast) {
+                window.showToast(`${product.name} added to cart!`);
+            } else {
+                alert(`${product.name} added to cart!`);
+            }
         } catch (error) {
             console.error('Failed to add to cart:', error);
-            alert(`Could not add ${product.name} to cart.`);
+            if (window.showToast) {
+                window.showToast(`Could not add ${product.name} to cart.`, true);
+            } else {
+                alert(`Could not add ${product.name} to cart.`);
+            }
         }
     };
 
     const addToWishlist = (product) => {
-        alert(`${product.name} added to wishlist!`);
+        if (window.showToast) {
+            window.showToast(`${product.name} added to wishlist!`);
+        } else {
+            alert(`${product.name} added to wishlist!`);
+        }
     };
 
     // Derive list of categories dynamically from products
@@ -44,7 +57,7 @@ export default function Catalog() {
     const filteredProducts = products.filter(product => {
         const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              (product.category && product.category.toLowerCase().includes(searchTerm.toLowerCase()));
+            (product.category && product.category.toLowerCase().includes(searchTerm.toLowerCase()));
         return matchesCategory && matchesSearch;
     });
 

@@ -1,12 +1,21 @@
 const API_BASE_URL = "http://localhost:8001/api/";
 
+const getHeaders = (includeAuth = true) => {
+    const headers = { 'Content-Type': 'application/json' };
+    if (includeAuth) {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            headers['Authorization'] = `Token ${token}`;
+        }
+    }
+    return headers;
+};
+
 export const HttpService = {
     async login(username, password) {
         const response = await fetch(`${API_BASE_URL}login/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: getHeaders(false),
             body: JSON.stringify({ username, password })
         });
         if (!response.ok) {
@@ -15,10 +24,11 @@ export const HttpService = {
         }
         return response.json();
     },
+
     async register(username, email, password) {
         const response = await fetch(`${API_BASE_URL}register/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders(false),
             body: JSON.stringify({ username, email, password })
         });
         if (!response.ok) {
@@ -31,7 +41,7 @@ export const HttpService = {
     async logout(token) {
         const response = await fetch(`${API_BASE_URL}logout/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders(true),
             body: JSON.stringify({ token })
         });
         if (!response.ok) {
@@ -54,7 +64,9 @@ export const HttpService = {
     },
 
     async getOrders() {
-        const response = await fetch(`${API_BASE_URL}orders/`);
+        const response = await fetch(`${API_BASE_URL}orders/`, {
+            headers: getHeaders(true)
+        });
         if (!response.ok) throw new Error('Failed to fetch orders');
         return response.json();
     },
@@ -62,7 +74,7 @@ export const HttpService = {
     async createOrder(order) {
         const response = await fetch(`${API_BASE_URL}orders/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders(true),
             body: JSON.stringify(order)
         });
         if (!response.ok) throw new Error('Failed to create order');
@@ -72,7 +84,7 @@ export const HttpService = {
     async updateOrder(order) {
         const response = await fetch(`${API_BASE_URL}orders/${order.id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders(true),
             body: JSON.stringify(order)
         });
         if (!response.ok) throw new Error('Failed to update order');
@@ -81,7 +93,8 @@ export const HttpService = {
 
     async deleteOrder(id) {
         const response = await fetch(`${API_BASE_URL}orders/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getHeaders(true)
         });
         if (!response.ok) throw new Error('Failed to delete order');
         return response.json();
@@ -90,7 +103,7 @@ export const HttpService = {
     async createProducts(product) {
         const response = await fetch(`${API_BASE_URL}products`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders(true),
             body: JSON.stringify(product)
         });
         if (!response.ok) throw new Error('Failed to create product');
@@ -100,7 +113,7 @@ export const HttpService = {
     async updateProducts(product) {
         const response = await fetch(`${API_BASE_URL}products/${product.id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders(true),
             body: JSON.stringify(product)
         });
         if (!response.ok) throw new Error('Failed to update product');
@@ -109,14 +122,17 @@ export const HttpService = {
 
     async deleteProducts(id) {
         const response = await fetch(`${API_BASE_URL}products/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getHeaders(true)
         });
         if (!response.ok) throw new Error('Failed to delete product');
         return response.json();
     },
 
     async getCartItems() {
-        const response = await fetch(`${API_BASE_URL}cart-items`);
+        const response = await fetch(`${API_BASE_URL}cart-items`, {
+            headers: getHeaders(true)
+        });
         if (!response.ok) throw new Error('Failed to fetch cart items');
         return response.json();
     },
@@ -124,7 +140,7 @@ export const HttpService = {
     async createCartItem(item) {
         const response = await fetch(`${API_BASE_URL}cart-items`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders(true),
             body: JSON.stringify(item)
         });
         if (!response.ok) throw new Error('Failed to create cart item');
@@ -134,7 +150,7 @@ export const HttpService = {
     async updateCartItem(item) {
         const response = await fetch(`${API_BASE_URL}cart-items/${item.id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders(true),
             body: JSON.stringify(item)
         });
         if (!response.ok) throw new Error('Failed to update cart item');
@@ -143,7 +159,8 @@ export const HttpService = {
 
     async deleteCartItem(id) {
         const response = await fetch(`${API_BASE_URL}cart-items/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getHeaders(true)
         });
         if (!response.ok) throw new Error('Failed to delete cart item');
         return response.json();
