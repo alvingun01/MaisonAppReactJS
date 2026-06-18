@@ -6,6 +6,7 @@ import Catalog from './views/catalog';
 import Login from './views/login';
 import Cart from './views/cart';
 import ProductDetails from './views/productDetails';
+import Register from './views/register';
 const About = () => <h2>About Us</h2>;
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </main>
       <Footer />
