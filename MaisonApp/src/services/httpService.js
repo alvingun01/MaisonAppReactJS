@@ -48,7 +48,7 @@ export const HttpService = {
             const errData = await response.json().catch(() => ({}));
             throw new Error(errData.message || 'Logout failed');
         }
-        return response.json();
+        return response.json().catch(() => ({}));
     },
 
     async getProducts() {
@@ -97,7 +97,7 @@ export const HttpService = {
             headers: getHeaders(true)
         });
         if (!response.ok) throw new Error('Failed to delete order');
-        return response.json();
+        return response.json().catch(() => ({}));
     },
 
     async createProducts(product) {
@@ -126,7 +126,7 @@ export const HttpService = {
             headers: getHeaders(true)
         });
         if (!response.ok) throw new Error('Failed to delete product');
-        return response.json();
+        return response.json().catch(() => ({}));
     },
 
     async getCartItems() {
@@ -163,6 +163,6 @@ export const HttpService = {
             headers: getHeaders(true)
         });
         if (!response.ok) throw new Error('Failed to delete cart item');
-        return response.json();
+        return response.json().catch(() => ({}));
     }
 };

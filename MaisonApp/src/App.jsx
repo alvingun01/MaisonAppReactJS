@@ -4,6 +4,7 @@ import Navbar from './component/navbar';
 import Footer from './component/footer';
 import Catalog from './views/catalog';
 import Login from './views/login';
+import Cart from './views/cart';
 const About = () => <h2>About Us</h2>;
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </main>
       <Footer />

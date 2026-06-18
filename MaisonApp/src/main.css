@@ -272,6 +272,7 @@ textarea {
     line-height: 1.05;
     font-weight: 300;
     margin-bottom: 1.5rem;
+    color: inherit;
 }
 
 .hero__title em {
@@ -569,7 +570,7 @@ textarea {
 
 .product-card__original {
     font-size: 13px;
-    color: var(--warm-lt);
+    color: var(--warm-mid);
     text-decoration: line-through;
 }
 
@@ -706,6 +707,7 @@ textarea {
     font-size: clamp(2.5rem, 5vw, 4rem);
     font-weight: 300;
     line-height: 1.1;
+    color: inherit;
 }
 
 .page-hero__title em {
@@ -866,7 +868,7 @@ textarea {
 
 .product-detail__original {
     font-size: 14px;
-    color: var(--warm-lt);
+    color: var(--warm-mid);
     text-decoration: line-through;
     margin-bottom: 1.5rem;
 }
@@ -1049,7 +1051,7 @@ textarea {
     font-size: 11px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--warm-lt);
+    color: var(--warm-mid);
     background: none;
     border: none;
     cursor: pointer;

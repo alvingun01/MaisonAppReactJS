@@ -137,8 +137,8 @@ export const CartService = {
                 selected_size: item.selectedSize || ""
             };
             try {
-                await HttpService.updateCartItem(updatePayload);
                 cart[productId].quantity = nextQty;
+                await HttpService.updateCartItem(updatePayload);
             } catch (error) {
                 console.error('Error updating cart item quantity:', error);
                 throw error;

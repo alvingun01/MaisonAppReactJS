@@ -1,6 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { HttpService } from '../services/httpService';
 import { CartService } from '../services/cartService';
 import '../main.css';
 
