@@ -8,17 +8,9 @@ const formatCurrency = (value) => {
 };
 
 export default function Cart() {
-    // const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
     const [promoCode, setPromoCode] = useState('');
 
-    // useEffect(() => {
-    //     HttpService.getProducts().then(data => {
-    //         setProducts(data);
-    //     }).catch(error => {
-    //         console.error('Failed to load products:', error);
-    //     })
-    // })
     useEffect(() => {
         const handleCartUpdate = () => {
             setCart({ ...CartService.getCart() });

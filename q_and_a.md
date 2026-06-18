@@ -1651,4 +1651,125 @@ This document compiles the questions asked by the user and the answers provided 
 > 
 > By setting `color: inherit;`, these headings bypass the global `h1` color override and inherit the light foreground colors (`color: var(--white)`) defined by their parent dark-background containers.
 
+---
+
+## 51. Resolving Cascading Renders from Synchronous `setState` in `useEffect`
+
+**User:**
+> Explain what this problem is and help me fix it: Error: Calling setState synchronously within an effect can trigger cascading renders ... @[/Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/productDetails.jsx:L23]
+
+**Assistant:**
+> ### The Problem
+> The error occurred because `setCurrProduct(product)` was executed synchronously inside the body of a `useEffect` hook that depended on `products` and `currProduct` (`[products, currProduct]`):
+> 
+> ```javascript
+> useEffect(() => {
+>     HttpService.getProducts()
+>         .then(response => { setProducts(response); });
+> 
+>     if (Array.isArray(products)) {
+>         for (const product of products) {
+>             if (product.product_id == productId) {
+>                 setCurrProduct(product);
+>                 break;
+>             }
+>         }
+>     }
+> }, [products, currProduct]);
+> ```
+> 
+> Here is how the infinite render loop triggers:
+> 1. When the promise resolves, it calls `setProducts(response)`, which schedules a re-render.
+> 2. Because `products` is in the dependency array, the `useEffect` runs again.
+> 3. During this run, `products` is populated. The synchronous loop finds the product and calls `setCurrProduct(product)`.
+> 4. Changing `currProduct` triggers another re-render.
+> 5. Since `currProduct` is also in the dependency array, `useEffect` runs **again**, starting a new network request and calling `setProducts` and `setCurrProduct` repeatedly.
+> 
+> ### The Solution
+> We refactored the `useEffect` block inside [productDetails.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/productDetails.jsx) to perform the product search inside the asynchronous `.then()` handler, depending only on `[productId]`:
+> 
+> ```javascript
+> useEffect(() => {
+>     HttpService.getProducts()
+>         .then(response => {
+>             setProducts(response);
+>             const found = response.find(p => p.product_id == productId || p.id == productId);
+>             if (found) {
+>                 setCurrProduct(found);
+>             }
+>         })
+>         .catch(error => {
+>             console.error('Error fetching products:', error);
+>         });
+> }, [productId]);
+> ```
+> This prevents cascading render triggers because the effect only fires once when the `productId` changes.
+
+---
+
+## 52. Resolving Undefined Router Navigation Hook and `$scope` in React Component
+
+**User:**
+> Explain what this problem is and help me fix it: 'navigate' is not defined. @[/Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/productDetails.jsx:L56]
+
+**Assistant:**
+> ### The Problem
+> The error occurred because the component was attempting to perform client-side routing via `navigate('/cart')` without importing or initializing the router navigation hook `useNavigate` from `react-router-dom`.
+> 
+> Additionally, there were legacy AngularJS references remaining in the helper functions:
+> 1. `$scope.currProduct` (inside `applyFilter`)
+> 2. `$scope.addToWishlist` and `$scope.wishlist` (inside `addToWishlist`)
+> 
+> Because `$scope` is not defined in the scope of a React function component, these references would throw `ReferenceError: $scope is not defined` as soon as they were evaluated or executed.
+> 
+> ### The Solution
+> We did the following updates to [productDetails.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/productDetails.jsx):
+> 1. **Initialized `useNavigate`:** Imported `useNavigate` from `react-router-dom` and instantiated it with `const navigate = useNavigate();` at the top of the component function.
+> 2. **Eliminated AngularJS `$scope`:** Refactored `applyFilter` to reference `currProduct` directly, and refactored `addToWishlist` to use standard JS local storage handling for the wishlist.
+
+---
+
+## 53. The Necessity of Loading/Null Guards for Asynchronous States in React
+
+**User:**
+> explain why i need the null guard? @[/Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/productDetails.jsx:L29-L35]
+
+**Assistant:**
+> In React, you need the null guard because of how component initialization and the render lifecycle work:
+> 
+> 1. **Initial `null` State:**
+>    When the component mounts, `currProduct` is initialized to `null`.
+> 
+> 2. **Synchronous Render Phase:**
+>    React immediately evaluates the returned JSX on the initial render. If there is no guard clause, JavaScript attempts to read properties like `{currProduct.emoji}` or `{currProduct.category}`. Because `currProduct` is `null`, this throws a fatal `TypeError: Cannot read properties of null (reading 'emoji')` and crashes the engine.
+> 
+> 3. **Timing of `useEffect`:**
+>    React's `useEffect` hooks only execute *after* the initial render has completed successfully. If the render phase crashes, the mount is aborted, the `useEffect` never fires, and the HTTP request is never initiated.
+> 
+> **How the Null Guard works:**
+> The guard intercepts the initial render while `currProduct` is `null` and returns a placeholder loading UI. This allows the render to complete successfully, triggering `useEffect` to fetch the data. Once the request completes and updates the state, the component re-renders with the loaded data, safely bypassing the guard.
+
+---
+
+## 54. Resolving Comma-Separated String Mapping as Arrays in React
+
+**User:**
+> productDetails.jsx:121 Uncaught TypeError: currProduct.sizes.map is not a function
+
+**Assistant:**
+> ### The Problem
+> The error occurred because the product's `sizes` property returned by the backend API is formatted as a comma-separated string (e.g. `"Small,Medium,Large"`) or `null`, rather than a JSON array of strings.
+> 
+> Because JavaScript strings do not possess a `.map()` method, calling `currProduct.sizes.map(...)` throws a fatal `TypeError: currProduct.sizes.map is not a function`.
+> 
+> ### The Solution
+> We refactored the size-rendering section in [productDetails.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/productDetails.jsx) to:
+> 1. Check if `currProduct.sizes` is a string using `typeof currProduct.sizes === 'string'`.
+> 2. Call `.split(',')` on the string to convert it into a standard array (e.g. `['Small', 'Medium', 'Large']`).
+> 3. Map over the newly created array to render size select buttons.
+
+
+
+
+
 

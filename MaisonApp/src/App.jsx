@@ -5,6 +5,7 @@ import Footer from './component/footer';
 import Catalog from './views/catalog';
 import Login from './views/login';
 import Cart from './views/cart';
+import ProductDetails from './views/productDetails';
 const About = () => <h2>About Us</h2>;
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
         </Routes>
       </main>
       <Footer />
