@@ -7,6 +7,7 @@ import Login from './views/login';
 import Cart from './views/cart';
 import ProductDetails from './views/productDetails';
 import Register from './views/register';
+import Checkout from './views/checkout';
 const About = () => <h2>About Us</h2>;
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </main>
       <Footer />

@@ -64,7 +64,7 @@ export const HttpService = {
     },
 
     async getOrders() {
-        const response = await fetch(`${API_BASE_URL}orders/`, {
+        const response = await fetch(`${API_BASE_URL}orders`, {
             headers: getHeaders(true)
         });
         if (!response.ok) throw new Error('Failed to fetch orders');
@@ -72,12 +72,16 @@ export const HttpService = {
     },
 
     async createOrder(order) {
-        const response = await fetch(`${API_BASE_URL}orders/`, {
+        const response = await fetch(`${API_BASE_URL}orders`, {
             method: 'POST',
             headers: getHeaders(true),
             body: JSON.stringify(order)
         });
-        if (!response.ok) throw new Error('Failed to create order');
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            const errMsg = errData.message || JSON.stringify(errData) || `Status: ${response.status}`;
+            throw new Error(`Failed to create order: ${errMsg}`);
+        }
         return response.json();
     },
 
