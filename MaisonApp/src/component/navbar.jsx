@@ -1,28 +1,24 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { CartService } from '../services/cartService';
 import '../main.css';
+import { useCart } from '../hooks/useCart';
 
 
 export default function Navbar() {
     const location = useLocation();
     const currentPath = location.pathname;
-    const [cartCount, setCartCount] = useState(0);
+    // const [cartCount, setCartCount] = useState(0);
     const [wishlistCount, setWishlistCount] = useState(0);
+    const { cart, cartCount, clearCart } = useCart();
 
     const isLoggedIn = () => !!localStorage.getItem("authToken");
     const logout = () => {
         localStorage.removeItem("authToken");
-        CartService.clearCart();
+        clearCart();
         window.location.href = "/";
     };
 
     useEffect(() => {
-        const handleCartUpdate = () => {
-            setCartCount(CartService.getCartCount());
-        };
-
-        window.addEventListener('cart-updated', handleCartUpdate);
 
         window.showToast = (message, isError = false) => {
             const toast = document.getElementById("toast");
@@ -44,16 +40,7 @@ export default function Navbar() {
             }
         };
 
-        CartService.loadCart()
-            .then(() => {
-                handleCartUpdate();
-            })
-            .catch(error => {
-                console.error('Failed to load cart items initially:', error);
-            });
-
         return () => {
-            window.removeEventListener('cart-updated', handleCartUpdate);
             delete window.showToast;
         };
     }, []);

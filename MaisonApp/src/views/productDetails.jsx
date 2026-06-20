@@ -2,7 +2,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import Productcard from '../component/productcard';
 import { useEffect, useState } from 'react';
 import { HttpService } from '../services/httpService';
-import { CartService } from '../services/cartService';
+import { useCart } from '../hooks/useCart';
 
 export default function ProductDetails() {
     let productId = useParams().id;
@@ -53,8 +53,10 @@ export default function ProductDetails() {
         setSelectedSize(size);
     };
 
+    const { addToCart: addToCartViaHook } = useCart();
+
     const addToCart = (product, qty) => {
-        CartService.addToCart(product, qty, selectedSize);
+        addToCartViaHook(product, qty, selectedSize);
     };
     const buyNow = function (product, qty) {
         addToCart(product, qty);

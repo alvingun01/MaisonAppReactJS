@@ -1,13 +1,13 @@
 import "../main.css";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { CartService } from "../services/cartService";
+import { useCart } from "../hooks/useCart";
 import { OrderService } from "../services/orderService";
 import MiniOrderSummary from "../component/miniOrderSummary";
-import { use } from "react";
+
 export default function Checkout() {
+    const { cart, shipping, subtotal, discount, clearCart } = useCart();
     const [step, setStep] = useState(1);
-    const [cart, setCart] = useState(() => CartService.getCart());
     const [order, setOrder] = useState(null);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -29,21 +29,7 @@ export default function Checkout() {
     const isAddrFormInvalid = !firstName || !lastName || !email || !line1 || !city || !zip || !country;
     const isPaymentFormInvalid = !ccNumber || !ccName || !ccExp || !ccCVV;
 
-    useEffect(() => {
-        // Fetch cart from backend on mount
-        CartService.loadCart().then((loadedCart) => {
-            setCart({ ...loadedCart });
-        });
 
-        // Keep in sync with any updates (e.g. from navbar or mini summary changes)
-        // const handleCartUpdate = () => {
-        //     setCart({ ...CartService.getCart() });
-        // };
-        // window.addEventListener("cart-updated", handleCartUpdate);
-        // return () => {
-        //     window.removeEventListener("cart-updated", handleCartUpdate);
-        // };
-    }, []);
 
     useEffect(() => {
         OrderService.getOrders().then((orders) => {
@@ -88,8 +74,8 @@ export default function Checkout() {
                 return;
             }
             setPaymentError(false);
-            setOrder(OrderService.createOrder(cart, paymentInfo, CartService.getShipping(), CartService.getSubtotal(), CartService.getDiscount()));
-            CartService.clearCart();
+            setOrder(OrderService.createOrder(cart, paymentInfo, shipping, subtotal, discount));
+            clearCart();
             setStep(3);
         }
     }

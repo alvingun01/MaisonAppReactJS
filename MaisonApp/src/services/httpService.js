@@ -133,40 +133,40 @@ export const HttpService = {
         return response.json().catch(() => ({}));
     },
 
-    async getCartItems() {
-        const response = await fetch(`${API_BASE_URL}cart-items`, {
+    async getCart() {
+        const response = await fetch(`${API_BASE_URL}cart`, {
             headers: getHeaders(true)
         });
-        if (!response.ok) throw new Error('Failed to fetch cart items');
+        if (!response.ok) throw new Error('Failed to fetch cart');
         return response.json();
     },
 
-    async createCartItem(item) {
-        const response = await fetch(`${API_BASE_URL}cart-items`, {
+    async createCart(cart) {
+        const response = await fetch(`${API_BASE_URL}cart`, {
             method: 'POST',
             headers: getHeaders(true),
-            body: JSON.stringify(item)
+            body: JSON.stringify(cart)
         });
-        if (!response.ok) throw new Error('Failed to create cart item');
+        if (!response.ok) throw new Error('Failed to create cart');
         return response.json();
     },
 
-    async updateCartItem(item) {
-        const response = await fetch(`${API_BASE_URL}cart-items/${item.id}`, {
+    async updateCart(id, cart) {
+        const response = await fetch(`${API_BASE_URL}cart/${id}`, {
             method: 'PUT',
             headers: getHeaders(true),
-            body: JSON.stringify(item)
+            body: JSON.stringify(cart)
         });
-        if (!response.ok) throw new Error('Failed to update cart item');
+        if (!response.ok) throw new Error('Failed to update cart');
         return response.json();
     },
 
-    async deleteCartItem(id) {
-        const response = await fetch(`${API_BASE_URL}cart-items/${id}`, {
+    async deleteCart(id) {
+        const response = await fetch(`${API_BASE_URL}cart/${id}`, {
             method: 'DELETE',
             headers: getHeaders(true)
         });
-        if (!response.ok) throw new Error('Failed to delete cart item');
+        if (!response.ok) throw new Error('Failed to delete cart');
         return response.json().catch(() => ({}));
     }
 };

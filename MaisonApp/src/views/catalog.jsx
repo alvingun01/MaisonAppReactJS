@@ -2,7 +2,7 @@ import "../main.css"
 import Productcard from '../component/productcard';
 import { useState, useEffect } from 'react';
 import { HttpService } from '../services/httpService';
-import { CartService } from '../services/cartService';
+import { useCart } from "../hooks/useCart";
 
 export default function Catalog() {
     const [products, setProducts] = useState([]);
@@ -10,6 +10,7 @@ export default function Catalog() {
     const [sortBy, setSortBy] = useState('default');
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const { addToCart } = useCart();
 
     useEffect(() => {
         HttpService.getProducts()
@@ -24,23 +25,23 @@ export default function Catalog() {
             });
     }, []);
 
-    const addToCart = async (product) => {
-        try {
-            await CartService.addToCart(product, 1);
-            if (window.showToast) {
-                window.showToast(`${product.name} added to cart!`);
-            } else {
-                alert(`${product.name} added to cart!`);
-            }
-        } catch (error) {
-            console.error('Failed to add to cart:', error);
-            if (window.showToast) {
-                window.showToast(`Could not add ${product.name} to cart.`, true);
-            } else {
-                alert(`Could not add ${product.name} to cart.`);
-            }
-        }
-    };
+    // const addToCart = async (product) => {
+    //     try {
+    //         await CartService.addToCart(product, 1);
+    //         if (window.showToast) {
+    //             window.showToast(`${product.name} added to cart!`);
+    //         } else {
+    //             alert(`${product.name} added to cart!`);
+    //         }
+    //     } catch (error) {
+    //         console.error('Failed to add to cart:', error);
+    //         if (window.showToast) {
+    //             window.showToast(`Could not add ${product.name} to cart.`, true);
+    //         } else {
+    //             alert(`Could not add ${product.name} to cart.`);
+    //         }
+    //     }
+    // };
 
     const addToWishlist = (product) => {
         if (window.showToast) {

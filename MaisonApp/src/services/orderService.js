@@ -1,5 +1,4 @@
 import { HttpService } from "./httpService";
-import { CartService } from "./cartService";
 
 export const OrderService = {
     order: {},
@@ -98,18 +97,4 @@ export const OrderService = {
     clearOrder() {
         this.orders.length = 0;
     },
-
-    async clearCart() {
-        try {
-            await CartService.clearCart();
-        } catch (error) {
-            console.error('Error clearing cart in OrderService:', error);
-        }
-    },
-
-    async clearAll() {
-        this.clearOrder();
-        await this.clearCart();
-    }
-
 }
