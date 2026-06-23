@@ -2907,3 +2907,74 @@ This document compiles the questions asked by the user and the answers provided 
 > > Since the `<Navbar />` component is already wrapped inside `<CartProvider>` globally at the application root level in [App.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/App.jsx#L17), it does not need to wrap itself in a nested `<CartProvider>` container.
 > > 
 > > We replaced the outer `<CartProvider>` and `</CartProvider>` container tags inside `navbar.jsx` with standard React fragment delimiters (`<>` and `</>`), resolving the ReferenceError and keeping the DOM clean.
+>
+> ---
+>
+> ## 87. Refactoring and Migrating the Orders View to React
+>
+> **User:**
+> > modify style so that it follows the style react and change all the class= to className= @[/Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/order.jsx:L1-L68]
+>
+> **Assistant:**
+> > ### The Problems:
+> > 1. **AngularJS Directives**: The `order.jsx` template was filled with AngularJS directives such as `ng-repeat`, `ng-show`, `ng-click`, and `{{ bind }}` expressions.
+> > 2. **HTML Class Attributes**: Standard `class="..."` properties were used instead of React-compliant `className="..."`.
+> > 3. **Non-React Inline CSS**: Inline style declarations were formatted as standard CSS strings (e.g. `style="font-size: 13px"`) rather than JavaScript style objects (e.g. `style={{ fontSize: '13px' }}`).
+> > 4. **Missing Route Mapping**: The route `/orders` was linked in components (like footer and checkout) but had no declared path mapping inside [App.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/App.jsx).
+> > 
+> > ### The Solutions:
+> > We migrated [order.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/order.jsx) to be a fully functional React component:
+> > 1. **React State & Effects**: Added `useState` and `useEffect` hooks to fetch purchase history reactively via `OrderService.getOrders()` on component mount.
+> > 2. **Conformed Styles & Classes**: Replaced all `class=` attributes with `className=` and converted inline styling strings to React style objects.
+> > 3. **React Conditional Rendering & Array Mapping**:
+> >    - Replaced `ng-show="orders.length === 0"` with a standard React conditional ternary expression `{orders.length === 0 ? ... : ...}`.
+> >    - Replaced `ng-repeat="order in orders"` and `ng-repeat="item in order.products"` with `.map()` loops.
+> > 4. **Standard Event Handlers & Link Components**:
+> >    - Converted `ng-click="deleteOrder(order.id)"` to `onClick={() => deleteOrder(order.id)}`.
+> >    - Replaced HTML `<a href="#!/catalog">` with React Router `<Link to="/catalog">`.
+> > 5. **Declared Path Route**:
+> >    - Imported the `Order` view and declared the `/orders` route mapping in [App.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/App.jsx#L28).
+> >    - Updated `OrderService` inside [orderService.js](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/services/orderService.js#L54) to map product `emoji` metadata so that icons are preserved for new purchases.
+>
+> ---
+>
+> ## 88. Fix Direct State Mutation error in Wishlist View
+>
+> **User:**
+> > Explain what this problem is and help me fix it: Error: This value cannot be modified ... @[/Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/wishlist.jsx:L20]
+>
+> **Assistant:**
+> > ### The Problem:
+> > Inside [wishlist.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/views/wishlist.jsx), the `removeItem` function was attempting to modify the `wishlist` state object directly using `delete wishlist[product.id]`.
+> > 
+> > React state is **read-only / immutable**. Mutating a state variable directly is an anti-pattern because React checks object references to determine if a re-render is necessary. If you modify the object in-place without changing its reference, React will not know the state changed, leading to stale visual renders. Moreover, compilers and validation checkers will flag this as a direct mutation error.
+> > 
+> > ### The Solution:
+> > We resolved this error and corrected secondary React bugs in the wishlist component tree:
+> > 1. **Fixed State Mutation in `removeItem`**:
+> >    Modified the function to create a new shallow copy of the state using the object spread operator (`{ ...wishlist }`), delete the key from the copy, and apply it via the state setter function:
+> >    ```javascript
+> >    const removeItem = (product) => {
+> >        const newWishlist = { ...wishlist };
+> >        delete newWishlist[product.id];
+> >        setWishlist(newWishlist);
+> >        HttpService.deleteWishlist(product.id);
+> >    };
+> >    ```
+> > 2. **Fixed named/default import mismatch**:
+> >    Updated the import of `WishlistCardComponent` to use standard default import syntax without curly braces:
+> >    ```javascript
+> >    import WishlistCardComponent from "../component/wishlistCardComponent";
+> >    ```
+> > 3. **Fixed Props Destructuring in `WishlistCardComponent`**:
+> >    React components receive arguments as a unified `props` object. We updated the component signature in [wishlistCardComponent.jsx](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/component/wishlistCardComponent.jsx#L3) to use object destructuring instead of individual positional parameters:
+> >    ```javascript
+> >    export default function WishlistCardComponent({ product, handleMoveToCart, handleRemoveFromWishlist }) { ... }
+> >    ```
+> > 4. **Bound callbacks to product arguments**:
+> >    Modified the parent mappings in `wishlist.jsx` to pass arrow functions pre-bound to the individual product loop item:
+> >    ```jsx
+> >    handleMoveToCart={() => moveToCart(product)}
+> >    handleRemoveFromWishlist={() => handleRemoveFromWishlist(product)}
+> >    ```
+> >    And simplified the card buttons to execute these pre-bound callbacks directly on click (`onClick={handleMoveToCart}` and `onClick={handleRemoveFromWishlist}`).

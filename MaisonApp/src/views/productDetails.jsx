@@ -3,10 +3,12 @@ import Productcard from '../component/productcard';
 import { useEffect, useState } from 'react';
 import { HttpService } from '../services/httpService';
 import { useCart } from '../hooks/useCart';
+import { useWishlist } from '../hooks/useWishlist';
 
 export default function ProductDetails() {
     let productId = useParams().id;
     const navigate = useNavigate();
+    const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
     // const [currProduct, setCurrProduct] = useState(null);
     const [currProduct, setCurrProduct] = useState({});
     const [products, setProducts] = useState([]);
@@ -70,16 +72,16 @@ export default function ProductDetails() {
         return currProduct && product.category === currProduct.category;
     };
 
-    const addToWishlist = function (product) {
-        const wishlist = JSON.parse(localStorage.getItem("wishlist") || "{}");
-        if (!wishlist[product.id]) {
-            wishlist[product.id] = product;
-            localStorage.setItem("wishlist", JSON.stringify(wishlist));
-            if (window.showToast) {
-                window.showToast(`${product.name} added to wishlist!`);
-            }
-        }
-    };
+    // const addToWishlist = function (product) {
+    //     const wishlist = JSON.parse(localStorage.getItem("wishlist") || "{}");
+    //     if (!wishlist[product.id]) {
+    //         wishlist[product.id] = product;
+    //         localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    //         if (window.showToast) {
+    //             window.showToast(`${product.name} added to wishlist!`);
+    //         }
+    //     }
+    // };
     return (
         <>
             <main>

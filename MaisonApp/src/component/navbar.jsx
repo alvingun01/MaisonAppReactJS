@@ -2,15 +2,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../main.css';
 import { useCart } from '../hooks/useCart';
+import { useWishlist } from '../hooks/useWishlist';
 
 
 export default function Navbar() {
     const location = useLocation();
     const currentPath = location.pathname;
-    // const [cartCount, setCartCount] = useState(0);
-    const [wishlistCount, setWishlistCount] = useState(0);
-    const { cart, cartCount, clearCart } = useCart();
-
+    const { cartCount, clearCart } = useCart();
+    const { wishlistCount } = useWishlist();
     const isLoggedIn = () => !!localStorage.getItem("authToken");
     const logout = () => {
         localStorage.removeItem("authToken");

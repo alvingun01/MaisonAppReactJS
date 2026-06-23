@@ -3,6 +3,7 @@ import Productcard from '../component/productcard';
 import { useState, useEffect } from 'react';
 import { HttpService } from '../services/httpService';
 import { useCart } from "../hooks/useCart";
+import { useWishlist } from "../hooks/useWishlist";
 
 export default function Catalog() {
     const [products, setProducts] = useState([]);
@@ -11,6 +12,7 @@ export default function Catalog() {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
+    const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
     useEffect(() => {
         HttpService.getProducts()
@@ -42,14 +44,6 @@ export default function Catalog() {
     //         }
     //     }
     // };
-
-    const addToWishlist = (product) => {
-        if (window.showToast) {
-            window.showToast(`${product.name} added to wishlist!`);
-        } else {
-            alert(`${product.name} added to wishlist!`);
-        }
-    };
 
     // Derive list of categories dynamically from products
     const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];

@@ -73,6 +73,7 @@ export default function Checkout() {
                 setPaymentError(true);
                 return;
             }
+            console.log("cart", cart);
             setPaymentError(false);
             setOrder(OrderService.createOrder(cart, paymentInfo, shipping, subtotal, discount));
             clearCart();

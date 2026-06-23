@@ -168,5 +168,42 @@ export const HttpService = {
         });
         if (!response.ok) throw new Error('Failed to delete cart');
         return response.json().catch(() => ({}));
+    },
+
+    async getWishlist() {
+        const response = await fetch(`${API_BASE_URL}wishlist`, {
+            headers: getHeaders(true)
+        });
+        if (!response.ok) throw new Error('Failed to fetch wishlist');
+        return response.json();
+    },
+
+    async createWishlist(wishlist) {
+        const response = await fetch(`${API_BASE_URL}wishlist`, {
+            method: 'POST',
+            headers: getHeaders(true),
+            body: JSON.stringify(wishlist)
+        });
+        if (!response.ok) throw new Error('Failed to create wishlist');
+        return response.json();
+    },
+
+    async updateWishlist(id, wishlist) {
+        const response = await fetch(`${API_BASE_URL}wishlist/${id}`, {
+            method: 'PUT',
+            headers: getHeaders(true),
+            body: JSON.stringify(wishlist)
+        });
+        if (!response.ok) throw new Error('Failed to update wishlist');
+        return response.json();
+    },
+
+    async deleteWishlist(id) {
+        const response = await fetch(`${API_BASE_URL}wishlist/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders(true)
+        });
+        if (!response.ok) throw new Error('Failed to delete wishlist');
+        return response.json().catch(() => ({}));
     }
 };

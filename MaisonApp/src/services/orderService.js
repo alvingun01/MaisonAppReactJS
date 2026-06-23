@@ -36,6 +36,8 @@ export const OrderService = {
             total: subtotal + shippingCost - discount,
             items: Object.values(cartItems).map(item => ({
                 product: item.id,
+                name: item.name,
+                emoji: item.emoji,
                 quantity: item.quantity || 1,
                 price_at_purchase: item.price
             }))
@@ -53,6 +55,7 @@ export const OrderService = {
             products: Object.values(cartItems).map(item => ({
                 id: item.id,
                 name: item.name,
+                emoji: item.emoji,
                 quantity: item.quantity || 1,
                 price: item.price
             }))
