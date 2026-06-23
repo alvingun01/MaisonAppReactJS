@@ -2978,3 +2978,42 @@ This document compiles the questions asked by the user and the answers provided 
 > >    handleRemoveFromWishlist={() => handleRemoveFromWishlist(product)}
 > >    ```
 > >    And simplified the card buttons to execute these pre-bound callbacks directly on click (`onClick={handleMoveToCart}` and `onClick={handleRemoveFromWishlist}`).
+
+---
+
+## 91. Asynchronous `setState` in `useEffect` Callbacks
+
+**User:**
+> why is this set state is allowed in useeffect? @[/Users/alvin/Documents/MaisonAppReact/MaisonApp/src/hooks/useWishlist.jsx:L26]
+
+**Assistant:**
+> ### The Explanation:
+> The reason `setWishlist` is allowed inside [useWishlist.jsx:L26](file:///Users/alvin/Documents/MaisonAppReact/MaisonApp/src/hooks/useWishlist.jsx#L26) is because it is executed **asynchronously** inside a Promise `.then(...)` handler callback:
+> 
+> ```javascript
+> useEffect(() => {
+>     if (isLoggedIn()) {
+>         HttpService.getWishlist().then(async (data) => {
+>             if (Array.isArray(data) && data.length > 0) {
+>                 setWishlist(data[0].items || {}); // <-- Asynchronous call
+>                 // ...
+> ```
+> 
+> Here is why this differs from the disallowed patterns:
+> 1. **No Cascading Renders**: The warning *"Calling setState synchronously within an effect can trigger cascading renders"* occurs when `setState` is called **synchronously** in the main body of a `useEffect` on mount. This forces React to render the component, immediately trigger the effect, change the state, and render the component again in the same frame.
+> 2. **Asynchronous Resolution**: When `setWishlist` runs inside the `.then(...)` callback, it executes after the initial render cycle has fully completed, the browser has painted the DOM, and the network request has returned. This is the standard React pattern for synchronizing state with database/network services.
+
+---
+
+## 92. The Purpose of State Persistence (`persistWishlist`)
+
+**User:**
+> why do we need persistwishlist @[/Users/alvin/Documents/MaisonAppReact/MaisonApp/src/hooks/useWishlist.jsx:L43]
+
+**Assistant:**
+> ### The Explanation:
+> `persistWishlist` is necessary to bridge the gap between **volatile local state** and **durable server storage**:
+> 
+> 1. **Client vs. Server State**: The `wishlist` state inside React is stored in volatile browser memory. If the user refreshes their browser, closes the tab, or logs in from another device, all local React state is lost. `persistWishlist` performs the network call (`createWishlist` or `updateWishlist`) to save the data in the PostgreSQL/Django database on the server, making it permanent.
+> 2. **Guest Fallback**: If the user is a guest (`!isLoggedIn()`), we save the wishlist to `localStorage` instead of the database.
+> 3. **Debounced Syncing (Performance)**: We wrap `persistWishlist` inside a debounced callback (`debouncedSaveWishlist = useDebouncedCallback(persistWishlist, 500)`). If a user rapidly adds or removes multiple items, the local React UI updates instantly, but we wait 500ms before sending a single network call to the database. This prevents thrashing the server with dozens of immediate API requests.
