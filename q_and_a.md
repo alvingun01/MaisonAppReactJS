@@ -3017,3 +3017,43 @@ This document compiles the questions asked by the user and the answers provided 
 > 1. **Client vs. Server State**: The `wishlist` state inside React is stored in volatile browser memory. If the user refreshes their browser, closes the tab, or logs in from another device, all local React state is lost. `persistWishlist` performs the network call (`createWishlist` or `updateWishlist`) to save the data in the PostgreSQL/Django database on the server, making it permanent.
 > 2. **Guest Fallback**: If the user is a guest (`!isLoggedIn()`), we save the wishlist to `localStorage` instead of the database.
 > 3. **Debounced Syncing (Performance)**: We wrap `persistWishlist` inside a debounced callback (`debouncedSaveWishlist = useDebouncedCallback(persistWishlist, 500)`). If a user rapidly adds or removes multiple items, the local React UI updates instantly, but we wait 500ms before sending a single network call to the database. This prevents thrashing the server with dozens of immediate API requests.
+
+---
+
+## 93. Asynchronous vs. Non-Blocking Functions in JavaScript
+
+**User:**
+> is to create a function that is non blocking  async needed?
+
+**Assistant:**
+> ### The Explanation:
+> 
+> Simply marking a function with the `async` keyword **does not automatically make it non-blocking**.
+> 
+> Here is a breakdown of how JavaScript handles synchronization and execution:
+> 
+> #### 1. JavaScript is Single-Threaded
+> JavaScript runs on a single main thread. It can only execute one instruction at a time. If you write a long synchronous computation, it will **block** the main thread, freezing the UI (no mouse clicks, scrolling, or animations) until the computation finishes.
+> 
+> #### 2. `async` does NOT create a new thread
+> If you make a CPU-intensive calculation function `async`, it will still run on the main thread and block it:
+> ```javascript
+> async function heavyCalculation() {
+>     let result = 0;
+>     for (let i = 0; i < 1e9; i++) { // Synchronous heavy loop
+>         result += i;
+>     }
+>     return result;
+> }
+> ```
+> *Note: Calling `heavyCalculation()` will still freeze the browser UI.*
+> 
+> #### 3. When `async` / `await` is actually needed
+> You use `async` and Promises when working with operations that are handled by the browser's background APIs (web APIs) or Node.js runtime environment:
+> * **I/O Bound Tasks**: Network requests (`fetch`), file system access, or database queries.
+> * **Timers**: `setTimeout`, `setInterval`.
+> 
+> In these cases, the engine hands off the task to the browser/operating system and frees up the JavaScript main thread. When the task finishes, it posts a callback to JavaScript's event loop queue to resume execution.
+> 
+> #### 4. How to make CPU-heavy tasks truly non-blocking
+> If you have a blocking, computationally heavy algorithm and want to keep the UI interactive, you must delegate it to a **Web Worker** (for browsers) or a **Worker Thread** (for Node.js), which runs on a completely separate thread.

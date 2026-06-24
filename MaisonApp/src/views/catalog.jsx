@@ -12,7 +12,7 @@ export default function Catalog() {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
-    const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
+    const { addToWishlist } = useWishlist();
 
     useEffect(() => {
         HttpService.getProducts()
@@ -27,23 +27,6 @@ export default function Catalog() {
             });
     }, []);
 
-    // const addToCart = async (product) => {
-    //     try {
-    //         await CartService.addToCart(product, 1);
-    //         if (window.showToast) {
-    //             window.showToast(`${product.name} added to cart!`);
-    //         } else {
-    //             alert(`${product.name} added to cart!`);
-    //         }
-    //     } catch (error) {
-    //         console.error('Failed to add to cart:', error);
-    //         if (window.showToast) {
-    //             window.showToast(`Could not add ${product.name} to cart.`, true);
-    //         } else {
-    //             alert(`Could not add ${product.name} to cart.`);
-    //         }
-    //     }
-    // };
 
     // Derive list of categories dynamically from products
     const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
